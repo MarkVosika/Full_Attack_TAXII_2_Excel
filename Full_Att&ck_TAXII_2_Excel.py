@@ -1,8 +1,9 @@
 from stix2 import TAXIICollectionSource, Filter
-from taxii2client import Server, Collection
+from taxii2client.v20 import Server, Collection
 import json
 from openpyxl import Workbook
 from openpyxl.styles import Font
+
 
 #enterprise attack source
 collection = Collection("https://cti-taxii.mitre.org/stix/collections/95ecc380-afe9-11e4-9b6c-751b66dd541e/")
@@ -16,7 +17,7 @@ def parse_mitre_item(filter_type):
 	wb = Workbook()
 	for item in filter_type:
 		name = item[2]
-		print name
+		print (name)
 		category = tc_source.query(item)
 
 
@@ -46,17 +47,17 @@ def parse_mitre_item(filter_type):
 		for technique in category:
 				for index in enumerate(deduped_keys):
 					if index[1] in technique:
-						if isinstance(technique[index[1]], (str, unicode)):
-							list_of_lists[index[0]].append(technique[index[1]].encode("utf-8"))	
+						if isinstance(technique[index[1]], str):
+							list_of_lists[index[0]].append(technique[index[1]])	
 						elif isinstance(technique[index[1]], list):
 							new_list = []
 							for i in technique[index[1]]:
-								if isinstance(i, (str, unicode)):
-									x = i.encode("utf-8")
+								if isinstance(i, str):
+									x = i
 									new_list.append(x)
 								else:
 									for k,v in i.items():
-										x = k.encode("utf-8") + ":" + v.encode("utf-8")
+										x = k + ":" + v
 										new_list.append(x)
 							list_of_lists[index[0]].append(' | '.join(new_list))
 						else:
@@ -70,7 +71,7 @@ def parse_mitre_item(filter_type):
 		bold_font = Font(bold = True)		#set bold font variable
 
 		if count == 1:
-			current_sheet = wb.get_sheet_by_name('Sheet')
+			current_sheet = wb['Sheet']
 			current_sheet.title = name
 		else:
 			current_sheet = wb.create_sheet(name)
